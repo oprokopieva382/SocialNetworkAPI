@@ -73,4 +73,28 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-module.exports = { getAllUsers, getSingleUser, createUser, updateUser };
+
+// POST to add a new friend to a user's friend list
+const addFriend = async (req, res) => {
+  const { userId, friendId } = req.params;
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { friends: friendId } },
+      { new: true }
+    );
+    user
+      ? res.status(200).json(user)
+      : res.status(404).json({ message: "User not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+module.exports = {
+  getAllUsers,
+  getSingleUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  addFriend,
+};
