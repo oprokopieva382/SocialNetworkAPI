@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongoose").Types;
-const { Reaction, Thought } = require("../models");
+const { Reaction, Thought, User } = require("../models");
 
 // GET all thoughts
 const getAllThoughts = async (req, res) => {
@@ -25,8 +25,24 @@ const getSingleThought = async (req, res) => {
   }
 };
 
+// POST to create a new thought
+const createThought = async (req, res) => {
+  const { userId, thoughtText, username } = req.body;
+  try {
+    const newThought = await Thought.create({ thoughtText, username, userId });
+    await User.findByIdAndUpdate(userId, {
+      $push: { thoughts: newThought._id },
+    });
+    newThought
+      ? res.status(200).json(newThought)
+      : res.status(404).json({ message: "Thought not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 module.exports = {
   getAllThoughts,
   getSingleThought,
+  createThought,
 };
