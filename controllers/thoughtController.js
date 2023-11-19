@@ -96,6 +96,24 @@ const createReaction = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// DELETE to pull and remove a reaction by the reaction's reactionId value
+const removeReaction = async (req, res) => {
+  const { thoughtId, reactionId } = req.params;
+  try {
+    const updatedThought = await Thought.findByIdAndDelete(
+      thoughtId,
+      { $pull: { reactions: reactionId } },
+      { new: true }
+    );
+    updatedThought
+      ? res.status(200).json(updatedThought)
+      : res.status(404).json({ message: "Thought not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};  
+
 module.exports = {
   getAllThoughts,
   getSingleThought,
@@ -103,4 +121,5 @@ module.exports = {
   updateThought,
   deleteThought,
   createReaction,
+  removeReaction
 };
