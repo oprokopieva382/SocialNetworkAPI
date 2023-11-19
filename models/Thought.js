@@ -12,7 +12,7 @@ const thoughtSchema = new Schema(
     },
     createdAt: {
       type: Date,
-      default: dayjs().toDate(),
+      default: () => dayjs().toDate(),
     },
     username: {
       type: String,
@@ -23,6 +23,10 @@ const thoughtSchema = new Schema(
   {
     toJSON: {
       getters: true,
+      transform: (doc, ret) => {
+        ret.createdAt = dayjs(ret.createdAt).format(); 
+        return ret;
+      },
     },
   }
 );

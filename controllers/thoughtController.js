@@ -1,5 +1,4 @@
-const { ObjectId } = require("mongoose").Types;
-const { Reaction, Thought, User } = require("../models");
+const {Thought, User } = require("../models");
 
 // GET all thoughts
 const getAllThoughts = async (req, res) => {
@@ -62,17 +61,22 @@ const updateThought = async (req, res) => {
 // DELETE to remove thought by _id
 const deleteThought = async (req, res) => {
   const { thoughtId } = req.params;
+
   try {
     const deletedThought = await Thought.findByIdAndDelete(thoughtId);
     if (!deletedThought) {
       return res.status(404).json({ message: "Thought not found" });
     }
     // Remove the thought's _id from the associated user's thoughts array field
-    await User.findByIdAndUpdate(deletedThought.userId, {
-      $pull: { thoughts: thoughtId },
-    });
+    await User.findOneAndUpdate(
+      { thoughts: thoughtId },
+      {
+        $pull: { thoughts: thoughtId },
+      },
+      { new: true }
+    );
     res.status(200).json({
-      message: "User and associated thoughts deleted successfully",
+      message: "Thoughts deleted successfully",
     });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -101,9 +105,9 @@ const createReaction = async (req, res) => {
 const removeReaction = async (req, res) => {
   const { thoughtId, reactionId } = req.params;
   try {
-    const updatedThought = await Thought.findByIdAndDelete(
+    const updatedThought = await Thought.findByIdAndUpdate(
       thoughtId,
-      { $pull: { reactions: reactionId } },
+      { $pull: { reactions: { _id: reactionId } } },
       { new: true }
     );
     updatedThought
@@ -112,7 +116,7 @@ const removeReaction = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
-};  
+};
 
 module.exports = {
   getAllThoughts,
@@ -121,5 +125,5 @@ module.exports = {
   updateThought,
   deleteThought,
   createReaction,
-  removeReaction
+  removeReaction,
 };
