@@ -1,5 +1,4 @@
-const { ObjectId } = require("mongoose").Types;
-const { Reaction, Thought, User } = require("../models");
+const {Thought, User } = require("../models");
 
 // GET all thoughts
 const getAllThoughts = async (req, res) => {
