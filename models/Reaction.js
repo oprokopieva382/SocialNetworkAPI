@@ -24,6 +24,10 @@ const reactionSchema = new Schema(
   {
     toJSON: {
       getters: true,
+      transform: (doc, ret) => {
+        ret.createdAt = dayjs(ret.createdAt).format();
+        return ret;
+      },
     },
     id: false,
   }
