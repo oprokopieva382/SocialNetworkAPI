@@ -90,6 +90,24 @@ const addFriend = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// DELETE to remove a friend from a user's friend list
+const deleteFriend = async (req, res) => {
+  const { userId, friendId } = req.params;
+  try {
+    const user = await User.findByIdAndDelete(
+      userId,
+      { $pull: { friends: friendId } },
+      { new: true }
+    );
+    user
+      ? res.status(200).json(user)
+      : res.status(404).json({ message: "User not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getSingleUser,
@@ -97,4 +115,5 @@ module.exports = {
   updateUser,
   deleteUser,
   addFriend,
+  deleteFriend,
 };
