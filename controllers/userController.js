@@ -19,7 +19,9 @@ const getSingleUser = async (req, res) => {
       .populate("thoughts")
       .populate("friends");
 
-    user ? res.json(user) : res.status(404).json({ message: "User not found" });
+    user
+      ? res.status(200).json(user)
+      : res.status(404).json({ message: "User not found" });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -35,4 +37,22 @@ const createUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-module.exports = { getAllUsers, getSingleUser, createUser };
+
+// PUT to update a user by _id
+const updateUser = async (req, res) => {
+  const { userId } = req.params;
+  const { username, email } = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username, email },
+      { new: true }
+    );
+    updatedUser
+      ? res.status(200).json(updatedUser)
+      : res.status(404).json({ message: "User not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+module.exports = { getAllUsers, getSingleUser, createUser, updateUser };
