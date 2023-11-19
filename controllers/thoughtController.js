@@ -58,9 +58,30 @@ const updateThought = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// DELETE to remove thought by _id
+const deleteThought = async (req, res) => {
+  const { thoughtId } = req.params;
+  try {
+    const deletedThought = await Thought.findByIdAndDelete(thoughtId);
+    if (!deletedThought) {
+      return res.status(404).json({ message: "Thought not found" });
+    }
+    // Remove the thought's _id from the associated user's thoughts array field
+    await User.findByIdAndUpdate(deletedThought.userId, {
+      $pull: { thoughts: thoughtId },
+    });
+    res.status(200).json({
+      message: "User and associated thoughts deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 module.exports = {
   getAllThoughts,
   getSingleThought,
   createThought,
   updateThought,
+  deleteThought,
 };
