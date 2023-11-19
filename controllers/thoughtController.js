@@ -78,10 +78,29 @@ const deleteThought = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// POST to create a reaction stored in a single thought's reactions array field
+const createReaction = async (req, res) => {
+  const { thoughtId } = req.params;
+  const { reactionBody, username } = req.body;
+  try {
+    const updatedThought = await Thought.findByIdAndUpdate(
+      thoughtId,
+      { $push: { reactions: { reactionBody, username } } },
+      { new: true }
+    );
+    updatedThought
+      ? res.status(200).json(updatedThought)
+      : res.status(404).json({ message: "Thought  not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 module.exports = {
   getAllThoughts,
   getSingleThought,
   createThought,
   updateThought,
   deleteThought,
+  createReaction,
 };
