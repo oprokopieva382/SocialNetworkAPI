@@ -41,8 +41,26 @@ const createThought = async (req, res) => {
   }
 };
 
+// PUT to update a thought by _id
+const updateThought = async (req, res) => {
+  const { thoughtId } = req.params;
+  const { thoughtText } = req.body;
+  try {
+    const updatedThought = await Thought.findByIdAndUpdate(
+      thoughtId,
+      { thoughtText },
+      { new: true }
+    );
+    updatedThought
+      ? res.status(200).json(updatedThought)
+      : res.status(404).json({ message: "Thought not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 module.exports = {
   getAllThoughts,
   getSingleThought,
   createThought,
+  updateThought,
 };
