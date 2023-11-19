@@ -101,9 +101,9 @@ const createReaction = async (req, res) => {
 const removeReaction = async (req, res) => {
   const { thoughtId, reactionId } = req.params;
   try {
-    const updatedThought = await Thought.findByIdAndDelete(
+    const updatedThought = await Thought.findByIdAndUpdate(
       thoughtId,
-      { $pull: { reactions: reactionId } },
+      { $pull: { reactions: { _id: reactionId } } },
       { new: true }
     );
     updatedThought
