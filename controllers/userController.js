@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongoose").Types;
-const { User } = require("../models");
+const { User, Thought } = require("../models");
 
 // GET all users
 const getAllUsers = async (req, res) => {
@@ -51,6 +51,24 @@ const updateUser = async (req, res) => {
     updatedUser
       ? res.status(200).json(updatedUser)
       : res.status(404).json({ message: "User not found" });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// DELETE to remove user by _id
+const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Remove a user's associated thoughts when deleted
+    await Thought.deleteMany({ _id: { $in: deletedUser.thoughts } });
+    res.status(200).json({
+      message: "User and associated thoughts deleted successfully",
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
