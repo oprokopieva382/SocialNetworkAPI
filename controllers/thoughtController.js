@@ -48,7 +48,7 @@ const updateThought = async (req, res) => {
     const updatedThought = await Thought.findByIdAndUpdate(
       thoughtId,
       { thoughtText },
-      { new: true }
+      { runValidators: true, new: true }
     );
     updatedThought
       ? res.status(200).json(updatedThought)

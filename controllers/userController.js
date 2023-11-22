@@ -15,11 +15,15 @@ const getSingleUser = async (req, res) => {
   const { userId } = req.params;
   try {
     const user = await User.findById(userId)
+      .populate("thoughts")
+      .populate("friends")
+      .select("-__v");
 
     user
       ? res.status(200).json(user)
       : res.status(404).json({ message: "User not found" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -43,7 +47,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { username, email },
-      { new: true }
+      { runValidators: true, new: true }
     );
     updatedUser
       ? res.status(200).json(updatedUser)
